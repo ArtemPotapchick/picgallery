@@ -1,0 +1,27 @@
+table, td {
+    border: 1px solid black;
+  }
+.color1{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+    background-color: cornflowerblue;
+    border: 5px solid gold;
+    margin-left: 25px;
+    margin-top: 25px;
+}
+ .commondiv{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+    border: 5px solid darkslategray;
+    margin: 5px;
+    /* width: 2000px; */
+    height: 5000px;
+}
