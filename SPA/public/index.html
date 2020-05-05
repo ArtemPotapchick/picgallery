@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel = "stylesheet" href="css/style.css" type="text/css">
+  <link rel="stylesheet" href="scripts/semantic-ui-css/semantic.min.css">
+  <title>SPA Demo</title>
+</head>
+
+
+<body>
+  <div class="ui container">
+    <!-- Navigation Menu -->
+    <div class="ui four item inverted orange menu">
+       
+      <a class="item" href="/">
+        ГЛАВНАЯ
+        </a>
+      <a class="item" href="/addpic">
+      ДОБАВИТЬ КАРТИНУ
+      </a>
+      <a class="item" href="/aboutgallery">
+       О ГАЛЕРЕЕ
+      </a>
+      <a class="item" href="/chat">
+        ЧАТ
+      </a>
+    </div>
+
+
+    </div>
+
+<!-- Error Template -->
+<script id="error-template" type="text/x-handlebars-template">
+    <div class="ui {{color}} inverted segment" style="height:250px;">
+      <br>
+      <h2 class="ui center aligned icon header">
+        <i class="exclamation triangle icon"></i>
+        <div class="content">
+          {{title}}
+          <div class="sub header">{{message}}</div>
+        </div>
+      </h2>
+    </div>
+  </script>
+
+
+  <script id="header-template" type="text/x-handlebars-template">
+    <h1 class="ui header">ГЛАВНАЯ</h1>
+    <hr>
+    <div id="putHerePictures" class="commondiv">
+    </div>
+  <br>
+  <script>
+    for(var x=0; x<5; x++){
+        var board = document.createElement('div');
+        board.className='color1';
+        var img=document.createElement('img');
+        img.className="image";
+        //img.src="http://source.unsplash.com/random/300x300";
+        if (x%2===0)img.src="plane.jpg";
+        else img.src="shakal.jpg";
+        board.appendChild(img);
+        var h1=document.createElement('h1');
+        h1.innerText="Name";
+        board.appendChild(h1);
+        var h2=document.createElement('h2');
+        h2.innerText="Author";
+        board.appendChild(h2);
+        document.getElementById('putHerePictures').appendChild(board);
+        }
+     
+    // Функция выполнится в после загрузки страницы
+    $(document).ready(function()
+    {
+    });
+     
+    </script>
+  </script>
+
+
+
+<script id="addpic-template" type="text/x-handlebars-template">
+    <h1 class="ui header">ДОБАВИТЬ КАРТИНУ</h1>
+    <hr>
+    <form enctype="multipart/form-data" method="post">
+        <p>Загрузите ваши фотографии на сервер</p>
+        <p><input type="file" name="photo" multiple accept="image/*,image/jpeg">
+        <input type="submit" value="Отправить"></p>
+       </form>
+  </script>
+  
+  <!-- Exchange Conversion Template -->
+  <script id="about-template" type="text/x-handlebars-template">
+    <h1 class="ui header">О ГАЛЕРЕЕ</h1>
+    <hr>
+    <div class="info" > 
+        <h3>Этот сайт подойдет для любителей картин и искусства. На нем вы сможете оценить предложенные нами картинами,обсудить их в чате,а также добавить свою картину. </h3>
+
+    </div>
+  </script>
+  
+  <!-- Historical Rates Template -->
+  <script id="chat-template" type="text/x-handlebars-template">
+    <h1 class="ui header">ЧАТ</h1>
+
+    
+    <!-- Осталось настроить сам чат и запустить, для этого пишем небольшой скрипт. -->
+    <div id="web_chat_holder"></div>
+    <style>
+ #WebChatFormForm{
+  overflow: auto;
+  max-height: 220px;
+  width: 100%;
+  /*max-width: 600px;*/
+  overflow: auto;
+  max-height: 900px;
+ }
+
+#WebChatNameID{
+  margin-top:10px;
+}
+
+#WebChatTextID{
+  max-width: 600px;
+  max-height: 100px;
+  width: 600px;
+  margin-top:10px;
+  display:block;
+}
+    </style>
+  <script>
+    var timer = new Date();
+    function web_send_msg()
+    {
+        // Получение значений из элементов ввода.
+        var text = $("#WebChatTextID").val();
+        var name = $("#WebChatNameID").val();
+     
+        // Очистка формы
+        $("#WebChatTextID").val("");  
+     
+        // Зпишем время в момент отправки сообщения
+        timer = new Date();
+     
+        // Добавление отправленного сообщения к списку сообщений.
+        //$("#WebChatFormForm").append("<p><b>"+HtmlEncode(name)+": </b>"+HtmlEncode(text)+"</p>");
+     
+        // Отправка сообщения в канал чата
+        CometServer().web_pipe_send("web_chat_pipe", {"text":text, "name":name});
+     
+        // Уведомим остальные вкладки о том что мы добавили сообщение в чат
+        comet_server_signal().send_emit("AddToChat", {"text":text, "name":name})
+    }
+     
+     
+    // Функция выполнится после загрузки страницы
+    $(document).ready(function()
+    {
+        // Создание формы для чата. Вёрстка.
+        var html =  "<div style=\"border: 1px solid #ccc;padding:10px;\" >"
+                  + "<div id=\"WebChatFormForm\" style=\"max-width: 600px;overflow: auto;max-height: 900px;\"></div>"
+              + "<input type=\"text\" id=\"WebChatNameID\" style=\"margin-top:10px;\" placeholder=\"Укажите ваше имя...\" > <div id=\"answer_div\" style=\"float:right;\" ></div>"
+                  + "<textarea id = \"WebChatTextID\" placeholder = \"Отправьте сообщение в online чат...\" style=\"max-width: 600px;max-height: 100px;width: 600px;margin-top:10px;\" ></textarea>"
+     
+                      + "<div style=\"margin-bottom: 0px;margin-top: 10px;\">"
+                      +    "<input type=\"button\" style=\"width: 220px;\" onclick=\"web_send_msg();\" value=\"Отправить\" >"
+                      +    " <div id=\"answer_error\"  style=\"float:right;\" ></div>"
+                      + "</div>"
+                 +  "</div>";
+        $("#web_chat_holder").html(html);
+     
+        // Подписываемся на канал в который и будут отправлятся сообщения чата. 
+        CometServer().subscription("web_chat_pipe", function(msg){
+//НИЧЕГО НЕ МЕНЯЕТ console.log(["msg", msg]);
+            // Добавление полученого сообщения к списку сообщений.
+// НИЧЕГО НЕ МЕНЯЕТ $("#WebChatFormForm").append("<p><b>"+HtmlEncode(msg.data.name)+": </b>"+HtmlEncode(msg.data.text)+"</p>");
+        });
+     
+        // Подписываемся на событие добавления сообщения в чат нами, для того чтобы если чат открыт в нескольких вкладках
+        // наше сообщение добавленое на одной вкладке отобразилось на всех остальных без перезагрузки страницы
+        comet_server_signal().connect("AddToChat", function(msg){
+//ВЫВОД В КОНСОЛЬ            
+            console.log(["msg", msg]);
+            // Добавление полученого сообщения к списку сообщений.
+            $("#WebChatFormForm").append("<p><b>"+HtmlEncode(msg.name)+": </b>"+HtmlEncode(msg.text)+"</p>");
+        });
+     
+        // Подписываемся на канал в который и будут отпавлятся уведомления о доставке отправленых сообщений.
+        CometServer().subscription("#web_chat_pipe", function(p)
+        {
+            // Зпишем время в момент получения отчёта о доставке сообщения
+            var etime = new Date();
+     
+            console.log(["answer_to_web_chat_pipe", p]);
+            $("#answer_div").html("Сообщение доставлено "+p.data.number_messages+" получателям за "+ (etime.getTime() - timer.getTime() )+"ms");
+            $("#answer_error").html(" "+p.data.error);
+        });
+     
+       // Загружаем историю сообщений
+       CometServer().get_pipe_log("web_chat_pipe");
+    });
+     
+     
+    function HtmlEncode(s)
+    {
+      var el = document.createElement("div");
+      el.innerText = el.textContent = s;
+      s = el.innerHTML;
+      return s;
+    }
+    </script>
+  </script>
+
+
+
+
+
+    <!-- Application Root -->
+    <div id="app"></div>
+  </div>
+
+
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" ></script>
+  <script type="text/javascript" src="https://comet-server.ru/CometServerApi.js" ></script>
+  <script type="text/javascript" src="https://comet-server.ru/doc/html_chat.js" ></script>
+  <link rel="stylesheet" type="text/css" href="https://comet-server.ru/doc/html_chat.css">
+
+
+
+  <!-- JS Library Dependencies -->
+  <script src="scripts/jquery/dist/jquery.min.js"></script>
+  <script src="scripts/semantic-ui-css/semantic.min.js"></script>
+  <script src="scripts/axios/dist/axios.min.js"></script>
+  <script src="scripts/handlebars/dist/handlebars.min.js"></script>
+  <script src="scripts/vanilla-router/dist/vanilla-router.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
