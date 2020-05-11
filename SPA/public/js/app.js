@@ -7,6 +7,8 @@ window.addEventListener('load', () => {
     const addpicTemplate = Handlebars.compile($('#addpic-template').html());
     const aboutTemplate = Handlebars.compile($('#about-template').html());
     const chatTemplate = Handlebars.compile($('#chat-template').html());
+const loginTemplate = Handlebars.compile($('#login-template').html());
+const regTemplate = Handlebars.compile($('#reg-template').html());
   
     const router = new Router({
         mode: 'history',
@@ -20,10 +22,20 @@ window.addEventListener('load', () => {
         },
       });
 
+   
+      router.add('/reg',()=>{
+        let html = regTemplate();
+        el.html(html);
+      }
+      )
       router.add('/', () => {
         let html = headerTemplate();
         el.html(html);
       });
+      router.add('/d',()=>{
+        let html = loginTemplate();
+        el.html(html);
+      })
       
       router.add('/addpic', () => {
         let html = addpicTemplate();
@@ -65,3 +77,4 @@ window.addEventListener('load', () => {
 
 
   });
+  
